@@ -1,0 +1,20 @@
+{% extends "xadmin/views/model_form.html" %}
+{% load i18n admin_urls admin_static admin_modify %}
+
+{% block workflow %}
+<fieldset class="module aligned workflow">
+    <h2>{% trans "workflow approve" %}</h2>
+    <div style="padding:10px">
+        {% if can_restart %}
+        <a class="button" href="restart/{{workflow_instance.id}}" id="workflow_restart">{% trans "restart workflow" %}</a>
+        <p style="float:right;color:#666">{% trans "your apply has been denied,you can restart a new apply" %}</p>
+        {% else %}
+        <label class="control"><input type="radio" name="operation" value="1" checked> {% trans "agree" %}</label>
+        <label class="control"><input type="radio" name="operation" value="3"> {% trans "deny" %}</label>
+        <label class="control"><input type="radio" name="operation" value="4"> {% trans "terminate" %}</label>
+        <a class="button" href="approve/1" id="workflow_approve">{% trans "submit" %}</a>
+        {% endif %}
+    </div>
+</fieldset>
+{% endblock %}
+
