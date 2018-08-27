@@ -360,7 +360,7 @@ admin.site.register(Outsource,OutsourceAdmin)
 
 class Outsource_itemsAdmin(admin.ModelAdmin):
 
-    list_display = ['id','item_name','provider','num','price']
+    list_display = ['thisid','item_name','provider','num','price']
 
     def get_queryset(self, request):
         pros = ContentType.objects.get(app_label='basedata', model='project')
@@ -374,13 +374,19 @@ class Outsource_itemsAdmin(admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         if tmp.proID != 0:
+            oi = Outsource.objects.get(project_info=Project.objects.get(id=tmp.proID))
+            os = Outsource_items.objects.filter(outsource_info = oi)
+            maxID = 0
+            for o in os:
+                if o.thisid>maxID:
+                    maxID = o.thisid
             if request.user == Project.objects.get(id=tmp.proID).manager:
                 self.list_editable = ['item_name','provider','num','price']
 
-            if len(Outsource_items.objects.filter(item_name = '---',outsource_info=Outsource.objects.get(project_info = Project.objects.get(id=tmp.proID))))>0:
+            if len(Outsource_items.objects.filter(item_name = '---',outsource_info=Outsource.objects.get(oi))>0):
                 pass
             else:
-                newobj = Outsource_items.objects.create(item_name = "---", provider = "---",outsource_info=Outsource.objects.get(project_info = Project.objects.get(id=tmp.proID)))
+                newobj = Outsource_items.objects.create(thisid=maxID+1,item_name = "---", provider = "---",outsource_info=Outsource.objects.get(project_info = Project.objects.get(id=tmp.proID)))
                 newobj.save()
         else:
             self.message_user(request,"项目ID不存在，请重新获取")
@@ -409,28 +415,33 @@ class DeviceRecord(admin.ModelAdmin):
         print(request.user.title)
         if tmp.proID!=0:
             if request.user == Project.objects.get(id=tmp.proID).starter:
-                self.list_display = ['id', 'name', 'brand', 'type', 'specification', 'num', 'unit', 'insurance',
+                self.list_display = ['thisid', 'name', 'brand', 'type', 'specification', 'num', 'unit', 'insurance',
                                          'sale_price', 'get_total_sale_price']
                 self.list_editable = ['name', 'brand', 'type', 'specification', 'num', 'unit', 'insurance',
                                           'sale_price']
             elif request.user.title == 2:
-                self.list_display = ['id','name', 'brand', 'type', 'specification', 'num', 'unit', 'insurance','sale_price',
+                self.list_display = ['thisid','name', 'brand', 'type', 'specification', 'num', 'unit', 'insurance','sale_price',
                         'Inquiry_price','buy_from','buy_price']
                 self.list_editable = ['Inquiry_price','buy_from','buy_price']
 
             elif request.user.title == 1 or  request.user.title == 3:
-                self.list_display = ['id','name', 'brand', 'type', 'specification', 'num', 'unit', 'insurance','sale_price',
+                self.list_display = ['thisid','name', 'brand', 'type', 'specification', 'num', 'unit', 'insurance','sale_price',
                         'Inquiry_price','buy_from','buy_price']
                 self.list_editable = []
             else:
-                self.list_display = ['id', 'name', 'brand', 'type', 'specification', 'num', 'unit', 'insurance', 'sale_price','get_total_sale_price']
+                self.list_display = ['thisid', 'name', 'brand', 'type', 'specification', 'num', 'unit', 'insurance', 'sale_price','get_total_sale_price']
                 self.list_editable = []
 
         if tmp.proID != 0:
+            ds = Device.objects.filter(project_info=Project.objects.get(id=tmp.proID))
+            maxID = 0
+            for d in ds:
+                if d.thisid > maxID:
+                    maxID = d.thisid
             if len(Device.objects.filter(name = '---',project_info=Project.objects.get(id = tmp.proID)))>0:
                 pass
             else:
-                newobj = Device.objects.create(name = "---", brand = "---",project_info=Project.objects.get(id = tmp.proID))
+                newobj = Device.objects.create(thisid=maxID+1,name = "---", brand = "---",project_info=Project.objects.get(id = tmp.proID))
                 newobj.save()
         else:
             self.message_user(request,"项目ID不存在，请重新获取")
@@ -548,8 +559,8 @@ admin.site.register(Device,DeviceRecord)
 
 
 class DeviceChange(admin.ModelAdmin):
-    list_display = ['id','name', 'brand', 'type', 'specification', 'num', 'unit','sale_price','note']
-    ordering = ['id']
+    list_display = ['thisid','name', 'brand', 'type', 'specification', 'num', 'unit','sale_price','note']
+    ordering = ['thisid']
 
     def get_readonly_fields(self, request, obj=None):
         return ['agreed','workflow_node']
@@ -580,20 +591,25 @@ class DeviceChange(admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         if tmp.proID != 0:
+            dcs = Device_change.objects.filter(project_info=Project.objects.get(id=tmp.proID))
+            maxID = 0
+            for dc in dcs:
+                if dc.thisid > maxID:
+                    maxID = dc.thisid
             if request.user == Project.objects.get(id=tmp.proID).manager:
                 self.list_editable = ['name', 'brand', 'type', 'specification', 'num', 'unit', 'sale_price'
                                         ,'note']
             elif request.user.title == 2:
-                self.list_display = ['id','name', 'brand', 'type', 'specification', 'num', 'unit','sale_price','buy_price','note']
+                self.list_display = ['thisid','name', 'brand', 'type', 'specification', 'num', 'unit','sale_price','buy_price','note']
                 self.list_editable = ['buy_price']
             elif request.user.title == 1 or request.user.title == 3:
-                self.list_display = ['id', 'name', 'brand', 'type', 'specification', 'num', 'unit', 'sale_price',
+                self.list_display = ['thisid', 'name', 'brand', 'type', 'specification', 'num', 'unit', 'sale_price',
                                      'buy_price', 'note']
                 self.list_editable = []
             if len(Device_change.objects.filter(name='----', project_info=Project.objects.get(id=tmp.proID))) > 0:
                 pass
             else:
-                newobj = Device_change.objects.create(name="----", brand="---",
+                newobj = Device_change.objects.create(thisid = maxID+1,name="----", brand="---",
                                                       project_info=Project.objects.get(id=tmp.proID))
                 newobj.save()
         else:
@@ -684,8 +700,8 @@ admin.site.register(Device_change,DeviceChange)
 
 
 class Material_useAdmin(admin.ModelAdmin):
-    list_display = ['id','material_name', 'brand', 'guige', 'xinhao', 'num', 'unit', 'price','total']
-    ordering = ['id']
+    list_display = ['thisid','material_name', 'brand', 'guige', 'xinhao', 'num', 'unit', 'price','total']
+    ordering = ['thisid']
     def get_readonly_fields(self, request, obj=None):
         return ['agreed','workflow_node']
 
@@ -700,11 +716,17 @@ class Material_useAdmin(admin.ModelAdmin):
         return qs.filter(project_info=pro)
 
     def changelist_view(self, request, extra_context=None):
-        if len(Material_use.objects.filter(material_name='---', project_info=Project.objects.get(id=tmp.proID))) > 0:
-            pass
-        else:
-            newobj = Material_use.objects.create(material_name="---", project_info=Project.objects.get(id=tmp.proID))
-            newobj.save()
+        if tmp.proID!=0:
+            maxID = 0
+            ms = Material_use.objects.filter(project_info = Project.objects.get(id=tmp.proID))
+            for m in ms:
+                if m.thisid > maxID:
+                    maxID = m.thisid
+            if len(Material_use.objects.filter(material_name='---', project_info=Project.objects.get(id=tmp.proID))) > 0:
+                pass
+            else:
+                newobj = Material_use.objects.create(thisid = maxID+1,material_name="---", project_info=Project.objects.get(id=tmp.proID))
+                newobj.save()
 
         over = False
         can_submit = False
@@ -794,7 +816,7 @@ admin.site.register(Material_use,Material_useAdmin)
 
 
 class Device_finalAdmin(admin.ModelAdmin):
-    list_display = ['id','name', 'brand', 'type', 'specification', 'producer','produce_num','produce_time','place_keep','bill_num', 'price']
+    list_display = ['thisid','name', 'brand', 'type', 'specification', 'producer','produce_num','produce_time','place_keep','bill_num', 'price']
     def get_readonly_fields(self, request, obj=None):
         return ['agreed','workflow_node']
 
@@ -808,11 +830,17 @@ class Device_finalAdmin(admin.ModelAdmin):
         return qs.filter(project_info=pro)
 
     def changelist_view(self, request, extra_context=None):
-        if len(Device_final.objects.filter(name='---', project_info=Project.objects.get(id=tmp.proID))) > 0:
-            pass
-        else:
-            newobj = Device_final.objects.create(name="---", project_info=Project.objects.get(id=tmp.proID))
-            newobj.save()
+        if tmp.proID!=0:
+            maxID = 0
+            dfs = Device_final.objects.filter(project_info=Project.objects.get(id=tmp.proID))
+            for df in dfs:
+                if df.thisid > maxID:
+                    maxID = df.thisid
+            if len(Device_final.objects.filter(name='---', project_info=Project.objects.get(id=tmp.proID))) > 0:
+                pass
+            else:
+                newobj = Device_final.objects.create(thisid = maxID+1,name="---", project_info=Project.objects.get(id=tmp.proID))
+                newobj.save()
         can_submit = False
         extra_context = extra_context or {}
         id = tmp.proID
@@ -889,9 +917,9 @@ class Device_finalAdmin(admin.ModelAdmin):
 admin.site.register(Device_final,Device_finalAdmin)
 
 class work_hourAdmin(admin.ModelAdmin):
-    list_display = ['id','employee', 'work_content','start_time','finish_time', 'inside_work_hour', 'extra_work_hour',]
+    list_display = ['thisid','employee', 'work_content','start_time','finish_time', 'inside_work_hour', 'extra_work_hour',]
     list_filter = ['employee', 'start_time']
-    ordering = ['id']
+    ordering = ['thisid']
     def get_readonly_fields(self, request, obj=None):
         return ['agreed','workflow_node']
 
@@ -905,11 +933,17 @@ class work_hourAdmin(admin.ModelAdmin):
         return qs.filter(project_info=pro)
 
     def changelist_view(self, request, extra_context=None):
-        if len(work_hour.objects.filter(work_content='---', project_info=Project.objects.get(id=tmp.proID))) > 0:
-            pass
-        else:
-            newobj = work_hour.objects.create(work_content="---", project_info=Project.objects.get(id=tmp.proID))
-            newobj.save()
+        if tmp.proID!=0:
+            maxID = 0
+            ws = work_hour.objects.filter(project_info=Project.objects.get(id=tmp.proID))
+            for w in ws:
+                if w.thisid > maxID:
+                    maxID = w.thisid
+            if len(work_hour.objects.filter(work_content='---', project_info=Project.objects.get(id=tmp.proID))) > 0:
+                pass
+            else:
+                newobj = work_hour.objects.create(thisid = maxID+1,work_content="---", project_info=Project.objects.get(id=tmp.proID))
+                newobj.save()
         can_submit = False
         extra_context = extra_context or {}
 

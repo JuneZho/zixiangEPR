@@ -168,7 +168,7 @@ class Device(models.Model):
     project_info = models.ForeignKey(Project, on_delete=models.CASCADE,verbose_name=u"所属项目", null=True)
 
 
-    thisid = models.PositiveIntegerField(default=1,verbose_name="ID")
+    thisid = models.IntegerField(default=0,verbose_name="ID")
     name = models.CharField(max_length=20, default="", verbose_name=u"设备名称",blank=True, null=True)
     brand = models.CharField(verbose_name=u"品牌",max_length=const.DB_CHAR_NAME_20,choices=BRAND_CHOICE,blank=True, null=True)
     type = models.CharField(verbose_name=u"型号",max_length=const.DB_CHAR_NAME_20,blank=True, null=True)
@@ -223,6 +223,8 @@ class Device(models.Model):
 
 
 class Device_change(models.Model):
+
+    thisid = models.IntegerField(default=0,verbose_name="ID")
     name = models.CharField(max_length=20, default="", verbose_name=u"设备名称", blank=True, null=True)
     brand = models.CharField(verbose_name=u"品牌", max_length=const.DB_CHAR_NAME_20, choices=BRAND_CHOICE, blank=True,
                              null=True)
@@ -308,6 +310,8 @@ class Outsource(models.Model):
 
 
 class Outsource_items(models.Model):
+
+    thisid = models.IntegerField(default=0,verbose_name="ID")
     outsource_info = models.ForeignKey(Outsource,on_delete=models.CASCADE,verbose_name=u"所属外包项目",blank=True, null=True)
     item_name = models.CharField(max_length=const.DB_CHAR_NAME_20,default="",verbose_name=u"外包施工单位名称",blank=True, null=True)
     provider = models.CharField(max_length=const.DB_CHAR_NAME_20,default="",verbose_name=u"外包施工负责人",blank=True, null=True)
@@ -385,6 +389,8 @@ class Material_use(models.Model):
         verbose_name_plural = u"材料领用"
 
 class Device_final(models.Model):
+
+    thisid = models.IntegerField(default=0,verbose_name="ID")
     name = models.CharField(max_length=20, default="", verbose_name=u"设备名字",blank=True, null=True)
     brand = models.CharField(verbose_name=u"品牌",max_length=const.DB_CHAR_NAME_20,choices=BRAND_CHOICE,blank=True, null=True)
     type = models.CharField(verbose_name=u"型号",max_length=const.DB_CHAR_NAME_20,blank=True, null=True)
@@ -471,6 +477,8 @@ class Finish_report(models.Model):
 
 
 class work_hour(models.Model):
+
+    thisid = models.IntegerField(default=0,verbose_name="ID")
     input_date = models.DateField(verbose_name=u"填写日期", auto_now_add=True, blank=True, null=True)
     employee = models.ForeignKey(user_models.Employee,verbose_name=u"员工",blank=True, null=True,on_delete=models.CASCADE)
     start_time = models.DateTimeField(verbose_name=u"开始日期", blank=True, null=True)
